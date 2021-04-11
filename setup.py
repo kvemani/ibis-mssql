@@ -12,7 +12,7 @@ setup(
     name='ibis-mssql',
     url='https://github.com/quansight/ibis-mssql',
     version='0.1.5',
-    python_requires='>=3.7,<3.9',
+    python_requires='>=3.6,<3.9',
     description="Ibis backend for MSSQL",
     long_description=long_description,
     long_description_content_type='text/markdown',
