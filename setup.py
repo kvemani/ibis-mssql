@@ -28,7 +28,7 @@ setup(
     maintainer="Quansight",
     maintainer_email="costrouchov@quansight.com",
     packages=find_packages(),
-    install_requires=["ibis-framework", "sqlalchemy", "pyodbc"],
+    install_requires=["ibis-framework<1.4", "sqlalchemy<1.4", "pyodbc"],
     extras_require={
         'develop': [
             'black',
