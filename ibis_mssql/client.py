@@ -8,7 +8,7 @@ from sqlalchemy.dialects.mssql.pyodbc import MSDialect_pyodbc
 import ibis.expr.datatypes as dt
 import ibis.expr.operations as ops
 import ibis.expr.schema as sch
-import ibis.backends.base_sqlalchemy.alchemy as alch
+import ibis.sql.alchemy as alch
 
 from ibis_mssql.compiler import MSSQLDialect
 

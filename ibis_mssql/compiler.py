@@ -5,10 +5,10 @@ import sqlalchemy.dialects.mssql as mssql
 import ibis.common.exceptions as com
 import ibis.expr.datatypes as dt
 import ibis.expr.operations as ops
-import ibis.backends.base_sqlalchemy.alchemy as alch
+import ibis.sql.alchemy as alch
 
 # used for literal translate
-from ibis.backends.base_sqlalchemy.alchemy import fixed_arity, unary
+from ibis.sql.alchemy import fixed_arity, unary
 
 
 def raise_unsupported_op_error(translator, expr, *args):

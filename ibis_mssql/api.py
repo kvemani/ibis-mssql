@@ -1,4 +1,4 @@
-from ibis.backends.base_sqlalchemy.alchemy import to_sqlalchemy
+from ibis.sql.alchemy import to_sqlalchemy
 
 from ibis_mssql.client import MSSQLClient
 from ibis_mssql.compiler import (  # noqa: F401, E501
