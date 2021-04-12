@@ -204,3 +204,53 @@ class MSSQLDialect(alch.AlchemyDialect):
 
 
 dialect = MSSQLDialect
+
+def _find_params(expr):
+    """
+    Return the ordered list of parameters present
+    in this expression.
+
+    Limitations: Currently, we do not handle
+    string parameters (actually we overidentify every
+    column reference as a string parameter, so we 
+    disabled string params for now). 
+
+    TODO: This function is very primitive and may
+    break. It is to be tested rigorously for complex
+    queries with many parameters.
+    """
+    seen_params = []
+
+    stack = [expr.op()]
+    seen = []
+
+    while stack:
+        node = stack.pop()
+
+        if node not in seen:
+            seen.append(node)
+
+            for arg in node.flat_args():
+                if (isinstance(arg, int) or
+                    isinstance(arg, float)):
+                    if arg not in seen_params:
+                        seen_params.append(arg)
+                elif isinstance(arg, ir.Expr):
+                    stack.append(arg.op())
+
+    # reverse gives the correct order for 2 parameters
+    # TODO: Test for more parameters
+    seen_params.reverse()
+    return seen_params
+
+
+def to_sql(expr):
+    """
+    Translate ibis expression to query.
+
+    expr.compile() does not give actual parameter
+    values, hence this method.
+    """
+    compiled = expr.compile()
+    q = str(compiled.compile(compile_kwargs={'literal_binds': True}))
+    return q
