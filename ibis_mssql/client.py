@@ -82,7 +82,7 @@ class MSSQLClient(alch.AlchemyClient):
                 url = sa.engine.url.make_url(url)
                 engine = sa.create_engine(url)
 
-        super().__init__(egnine)
+        super().__init__(engine)
         self.database_name = engine.url.database
 
     def _execute(self, query, results = True):
