@@ -51,6 +51,7 @@ class MSSQLClient(alch.AlchemyClient):
 
     def __init__(
         self,
+        engine=None,
         host='localhost',
         user=None,
         password=None,
@@ -60,25 +61,49 @@ class MSSQLClient(alch.AlchemyClient):
         driver='pyodbc',
         odbc_driver='ODBC Driver 17 for SQL Server',
     ):
-        if url is None:
-            if driver != 'pyodbc':
-                raise NotImplementedError(
-                    'pyodbc is currently the only supported driver'
+        if engine is None:
+            if url is None:
+                if driver != 'pyodbc':
+                    raise NotImplementedError(
+                        'pyodbc is currently the only supported driver'
+                    )
+                user = user or getpass.getuser()
+                url = sa.engine.url.URL(
+                    'mssql+pyodbc',
+                    host=host,
+                    port=port,
+                    username=user,
+                    password=password,
+                    database=database,
+                    query={'driver': odbc_driver, 'autocommit': True},
                 )
-            user = user or getpass.getuser()
-            url = sa.engine.url.URL(
-                'mssql+pyodbc',
-                host=host,
-                port=port,
-                username=user,
-                password=password,
-                database=database,
-                query={'driver': odbc_driver},
-            )
+                engine = sa.create_engine(url)
+            else:
+                url = sa.engine.url.make_url(url)
+                engine = sa.create_engine(url)
+
+        super().__init__(egnine)
+        self.database_name = engine.url.database
+
+    def _execute(self, query, results = True):
+        """
+        If autocommit is enabled, disable explicit transaction
+        begin. Otherwise, it leads to 'pyodbc
+        function sequence error'.
+
+        This method overrides the parent 
+        ibis.sql.alchemy.AlchemyClient._execute.
+        
+        TODO: Fix this issue in Ibis
+        """
+        QUERY = 'query'
+        AUTOCOMMIT = 'autocommit'
+        if (QUERY in self.con.url.__dict__
+            and AUTOCOMMIT in self.con.url.query
+            and self.con.url.query[AUTOCOMMIT] == True):
+                return alch.AlchemyProxy(self.con.execute(query))
         else:
-            url = sa.engine.url.make_url(url)
-        super().__init__(sa.create_engine(url))
-        self.database_name = url.database
+            super()._execute(query, results)
 
     @contextlib.contextmanager
     def begin(self):
